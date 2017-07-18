@@ -2,15 +2,30 @@
 
 import json
 import logging
+import os
 import sys
 
+def load_json_file(fname, throw_if_missing = False):
+    if not os.path.isfile(fname):
+        if throw_if_missing:
+            raise RuntimeError("File {} does not exist.".format(fname))
+        else:
+            return None
+    with open(fname,'r') as f:
+        return json.load(f)
+
+CONFIG_LOCATIONS = [
+    "/etc/pyropossum/config.json",
+    os.path.join(os.path.expanduser('~'), '.pyropossum/config.json')
+]
+
 def load_config():
-    if len(sys.argv) > 1:
-        with open(sys.argv[1],'r') as f:
-            return json.load(f)
+    for location in CONFIG_LOCATIONS:
+        config = load_json_file(location)
+        if config:
+            return config
         pass
-    else:
-        return {"profile":"pyropossum","region":"us-east-1","stack":"iot3","output":5}
+    return {"profile":"pyropossum","region":"us-east-1","stack":"iot3","output":5}
 
 def configure_logging(modname):
     LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

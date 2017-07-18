@@ -1,6 +1,8 @@
 {
     "profile":"pyropossum",
+    "send-profile":"pyropossum-send",
+    "receive-profile":"pyropossum-receive",
     "region":"us-east-1",
-    "stack":"iot3",
+    "stack":"pyropossum1",
     "output":5
 }

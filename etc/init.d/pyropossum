@@ -11,7 +11,7 @@
 # NOT YET TESTED
 
 NAME=pyropossum
-SCRIPT=/usr/local/bin/pyro_daemon
+SCRIPT=/usr/local/bin/pyro-daemon
 RUNAS=root
 
 PIDFILE=/var/run/${NAME}.pid

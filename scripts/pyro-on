@@ -9,7 +9,7 @@ from pyropossum.config import load_config, configure_logging
 logger = configure_logging(__name__)
 config = load_config()
 
-PROFILE_NAME = config["profile"]
+PROFILE_NAME = config["send-profile"]
 REGION_NAME = config["region"]
 STACK_NAME = config["stack"]
 

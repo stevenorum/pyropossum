@@ -10,7 +10,7 @@ import time
 logger = configure_logging(__name__)
 config = load_config()
 
-PROFILE_NAME = config["profile"]
+PROFILE_NAME = config["receive-profile"]
 REGION_NAME = config["region"]
 STACK_NAME = config["stack"]
 OUTPUT_PIN = config["output"]
