@@ -1,0 +1,43 @@
+#!/usr/bin/env python3 -u
+
+import boto3
+from pyropossum.aws.pollers import SqsPoller
+from pyropossum.arduino.core import Arduino, ArduinoException
+from pyropossum.arduino.commands import ENABLE, DISABLE
+from pyropossum.config import load_config, configure_logging
+import time
+
+logger = configure_logging(__name__)
+config = load_config()
+
+PROFILE_NAME = config["profile"]
+REGION_NAME = config["region"]
+STACK_NAME = config["stack"]
+OUTPUT_PIN = config["output"]
+
+session = boto3.Session(profile_name=PROFILE_NAME, region_name=REGION_NAME)
+
+resources = {resource["LogicalResourceId"] : resource['PhysicalResourceId'] for resource in session.client('cloudformation').describe_stack_resources(StackName=STACK_NAME)['StackResources']}
+
+sns_topic = resources['SNSTopic']
+queue_url = resources['SQSQueue']
+
+while True:
+    try:
+        with Arduino.discover(timeout=1) as arduino:
+            def on_enable(*args, **kwargs):
+                ENABLE.call(inputs=OUTPUT_PIN, arduino=arduino)
+                pass
+            def on_disable(*args, **kwargs):
+                DISABLE.call(inputs=OUTPUT_PIN, arduino=arduino)
+                pass
+            poller = SqsPoller(queue_url=queue_url,sqs_client=session.client('sqs'),enable_actions=[on_enable],disable_actions=[on_disable])
+            logger.info("Starting SQS polling.")
+            poller.start_polling()
+            pass
+        pass
+    except ArduinoException as e:
+        logger.exception(str(e))
+        time.sleep(5)
+        pass
+    pass

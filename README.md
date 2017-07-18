@@ -1,3 +1,3 @@
 # pyropossum
 
-pyropossum is an API declaration and construction framework.
+pyropossum is a collection of arduino tools for home automation.

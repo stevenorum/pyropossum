@@ -1,0 +1,6 @@
+{
+    "profile":"pyropossum",
+    "region":"us-east-1",
+    "stack":"iot3",
+    "output":5
+}
