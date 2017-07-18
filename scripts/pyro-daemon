@@ -19,7 +19,6 @@ session = boto3.Session(profile_name=PROFILE_NAME, region_name=REGION_NAME)
 
 resources = {resource["LogicalResourceId"] : resource['PhysicalResourceId'] for resource in session.client('cloudformation').describe_stack_resources(StackName=STACK_NAME)['StackResources']}
 
-sns_topic = resources['SNSTopic']
 queue_url = resources['SQSQueue']
 
 while True:
