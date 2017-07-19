@@ -31,7 +31,7 @@ aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     "stack":"<CloudFormation stack name>"
 }
 ```
-[Here's my config as an example.](config/sender-config.json)
+[Here's my config as an example.](config/send-config.json)
 
 5. Install pyropossum from the command line.  The following line will do it, but you really should make sure to examine the [install script](install/sender-install.sh) first before piping it directly to sudo bash.
 ```
@@ -64,7 +64,7 @@ aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     "output":<digital pin on the Arduino to which the device being controlled is connected>
 }
 ```
-[Here's my config as an example.](config/receiver-config.json)
+[Here's my config as an example.](config/receive-config.json)
 
 4. Run the following command to start the pyropossum daemon.  (For some reason it is't currently working with /usr/sbin/service, so you have to directly call the init.d script.)
 ```
