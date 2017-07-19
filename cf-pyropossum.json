@@ -1,0 +1,137 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Creates the core resources necessary for a PyroPossum system to function.",
+    "Parameters": {
+        "SystemID": {
+            "Type": "String",
+            "Default": "pyropossum",
+            "Description": "Name or ID for the PyroPossum system being set up.  Must be unique within the AWS Account, as it's used in IAM resource names (among other things).  Must be identical across all CF stacks in the system."
+        }
+    },
+    "Resources": {
+        "SQSQueue" : {
+            "Type" : "AWS::SQS::Queue"
+        },
+        "DescribeStackPolicy": {
+            "Type": "AWS::IAM::ManagedPolicy",
+            "Properties": {
+                "Description" : "Policy granting permission to describe this CloudFormation stack.",
+                "PolicyDocument" : {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "Stmt1500308617000",
+                            "Effect": "Allow",
+                            "Action": [
+                                "cloudformation:DescribeStackResources"
+                            ],
+                            "Resource": [
+                                { "Fn::Sub" : "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*" }
+                            ]
+                        }
+                    ]
+                },
+                "ManagedPolicyName" : { "Fn::Sub" : "${SystemID}CFPolicy" }
+            }
+        },
+        "SendSQSPolicy": {
+            "Type": "AWS::IAM::ManagedPolicy",
+            "Properties": {
+                "Description" : "Policy granting permission to send to the SQS queue.",
+                "PolicyDocument" : {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "Stmt1500308617000",
+                            "Effect": "Allow",
+                            "Action": [
+                                "sqs:SendMessage",
+                                "sqs:SendMessageBatch"
+                            ],
+                            "Resource": [
+                                {"Fn::GetAtt": [ "SQSQueue", "Arn" ]}
+                            ]
+                        }
+                    ]
+                },
+                "ManagedPolicyName" : { "Fn::Sub" : "${SystemID}SQSSendPolicy" }
+            }
+        },
+        "ReceiveSQSPolicy": {
+            "Type": "AWS::IAM::ManagedPolicy",
+            "Properties": {
+                "Description" : "Policy granting permission to receive from the SQS queue.",
+                "PolicyDocument" : {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "Stmt1500308617000",
+                            "Effect": "Allow",
+                            "Action": [
+                                "sqs:ChangeMessageVisibility",
+                                "sqs:ChangeMessageVisibilityBatch",
+                                "sqs:DeleteMessage",
+                                "sqs:DeleteMessageBatch",
+                                "sqs:ReceiveMessage"
+                            ],
+                            "Resource": [
+                                {"Fn::GetAtt": [ "SQSQueue", "Arn" ]}
+                            ]
+                        }
+                    ]
+                },
+                "ManagedPolicyName" : { "Fn::Sub" : "${SystemID}SQSReceivePolicy" }
+            }
+        },
+        "SenderGroup": {
+            "Type": "AWS::IAM::Group",
+            "Properties": {
+                "GroupName": { "Fn::Sub" : "${SystemID}SenderGroup" },
+                "ManagedPolicyArns": [
+                    {"Ref": "DescribeStackPolicy"},
+                    {"Ref": "SendSQSPolicy"}
+                ]
+            }
+        },
+        "ReceiverGroup": {
+            "Type": "AWS::IAM::Group",
+            "Properties": {
+                "GroupName": { "Fn::Sub" : "${SystemID}ReceiverGroup" },
+                "ManagedPolicyArns": [
+                    {"Ref": "DescribeStackPolicy"},
+                    {"Ref": "ReceiveSQSPolicy"}
+                ]
+            }
+        },
+        "SenderUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Groups": [ {"Ref": "SenderGroup"} ],
+                "UserName": { "Fn::Sub" : "${SystemID}SenderUser" }
+            }
+        },
+        "ReceiverUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Groups": [ {"Ref": "ReceiverGroup"} ],
+                "UserName": { "Fn::Sub" : "${SystemID}ReceiverUser" }
+            }
+        }
+    },
+    "Outputs": {
+        "SQSQueueUrl": {
+            "Description" : "URL of the SQS queue used for notifying devices.",
+            "Value" : {"Ref" : "SQSQueue"},
+            "Export" : {
+                "Name" : { "Fn::Sub" : "${SystemID}-SQSQueueUrl" }
+            }
+        },
+        "SQSQueueArn": {
+            "Description" : "ARN of the SQS queue used for notifying devices.",
+            "Value" : {"Fn::GetAtt" : ["SQSQueue", "Arn"]},
+            "Export" : {
+                "Name" : { "Fn::Sub" : "${SystemID}-SQSQueueArn" }
+            }
+        }
+    }
+}

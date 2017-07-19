@@ -1,5 +1,4 @@
 {
-    "profile":"pyropossum",
     "send-profile":"pyropossum-send",
     "receive-profile":"pyropossum-receive",
     "region":"us-east-1",

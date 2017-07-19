@@ -43,6 +43,9 @@ def get_arduino_info(p):
     '''Get the manufacturer and type information for an Arduino.'''
     return BOARDS.get((p.vid, p.pid), None)
 
+def find_all_devices():
+    return [p for p in serial.tools.list_ports.comports()]
+
 def find_arduinos():
     '''Return all the Arduinos connected to this computer.'''
     return [p for p in serial.tools.list_ports.comports() if get_arduino_info(p)]
