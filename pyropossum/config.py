@@ -15,8 +15,8 @@ def load_json_file(fname, throw_if_missing = False):
         return json.load(f)
 
 CONFIG_LOCATIONS = [
-    "/etc/pyropossum/config.json",
-    os.path.join(os.path.expanduser('~'), '.pyropossum/config.json')
+    os.path.join(os.path.expanduser('~'), '.pyropossum/config.json'),
+    "/etc/pyropossum/config.json"
 ]
 
 def load_config():

@@ -1,0 +1,60 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+<block type="onfirstboot" id="onfirstboot" x="-289" y="-199">
+<next>
+<block type="authorizekey">
+<field name="1">YOUR SSH KEY HERE</field>
+<field name="2">pi</field>
+<next>
+<block type="sethostname">
+<field name="1">YOUR HOSTNAME HERE</field>
+<next>
+<block type="changepass">
+<field name="1">YOUR PASSWORD HERE</field>
+<next>
+<block type="wifisetup">
+<field name="1">YOUR WIFI NETWORK HERE</field>
+<field name="2">YOUR WIFI PASSWORD HERE</field>
+<field name="3">WPA/WPA2</field>
+<next>
+<block type="packageinstall">
+<field name="1">python3</field>
+<next>
+<block type="runcommand">
+<field name="1">apt-get update</field>
+<field name="2">root</field>
+<next>
+<block type="packageinstall">
+<field name="1">emacs</field>
+<next>
+<block type="packageinstall">
+<field name="1">python3-pip</field>
+<next>
+<block type="downloadfile">
+<field name="1">https://raw.githubusercontent.com/stevenorum/pyropossum/master/install/receiver-install.sh</field>
+<field name="2">/home/pi/install.sh</field>
+<next>
+<block type="runcommand">
+<field name="1">/bin/bash /home/pi/install.sh</field>
+<field name="2">root</field>
+</block>
+</next>
+</block>
+</next>
+</block>
+</next>
+</block>
+</next>
+</block>
+</next>
+</block>
+</next>
+</block>
+</next>
+</block>
+</next>
+</block>
+</next>
+</block>
+</next>
+</block>
+</xml>

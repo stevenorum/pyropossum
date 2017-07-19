@@ -1,0 +1,5 @@
+{
+    "send-profile":"pyropossum-send",
+    "region":"us-east-1",
+    "stack":"pyropossum1"
+}
