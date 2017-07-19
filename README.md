@@ -32,6 +32,7 @@ aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 }
 ```
 [Here's my config as an example.](config/sender-config.json)
+
 5. Install pyropossum from the command line.  The following line will do it, but you really should make sure to examine the [install script](install/sender-install.sh) first before piping it directly to sudo bash.
 ```
 curl https://raw.githubusercontent.com/stevenorum/pyropossum/master/install/sender-install.sh | sudo bash
@@ -45,7 +46,9 @@ pyro-off
 
 ### How to set up the receiver host for use with pyropossum:
 1a. If you're using a Raspberry Pi, you can use [PiBakery](http://www.pibakery.org) and [the included recipe](pibakery-recipe.xml) to perform a lot of the setup.  (You'll need to edit it to include your passwords, wifi info, and that sort of thing.)
+
 1b. If you don't want to use PiBakery, you can instead install this from the [receiver-install.sh](install/receiver-install.sh) script.  It has dependencies on python3 and pip3.  Everything after that it should install for you.
+
 2. Put the ReceiverUser creds into the file /var/.awscredentials on the receiver host
 ```
 [pyropossum-receive]
@@ -62,6 +65,7 @@ aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 }
 ```
 [Here's my config as an example.](config/receiver-config.json)
+
 4. Run the following command to start the pyropossum daemon.  (For some reason it is't currently working with /usr/sbin/service, so you have to directly call the init.d script.)
 ```
 /etc/init.d/pyropossum start
