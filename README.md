@@ -68,8 +68,9 @@ aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 4. Run the following command to start the pyropossum daemon.  (For some reason it is't currently working with /usr/sbin/service, so you have to directly call the init.d script.)
 ```
-/etc/init.d/pyropossum start
+sudo /etc/init.d/pyropossum start
 ```
+If it doesn't appear to be working, logs go to /var/log/pyropossum.log
 
 ### How to configure an IoT button to be a sender:
 1. Still need to write this section, but basically, spin up the iot.cf.json and button.cf.json CloudFormation templates.
