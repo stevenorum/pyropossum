@@ -1,0 +1,2 @@
+Look into https://gpiozero.readthedocs.io/en/stable/ to get rid of the arduino dependency.
+
