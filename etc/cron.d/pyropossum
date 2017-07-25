@@ -1,0 +1,1 @@
+* * * * * root ps -leaf | grep '/usr/bin/python3 -u /usr/local/bin/pyro[-]daemon' >> /var/log/pyropossum.cron || /etc/init.d/pyropossum start >> /var/log/pyropossum.cron

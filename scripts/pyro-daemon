@@ -33,8 +33,10 @@ def get_relay(target):
     pin = pin_map.get(target, pin_map.get("DEFAULT", None))
     if not pin:
         return None
-    relay = relay_map.get(pin, LED(int(pin)))
-    relay_map[pin] = relay
+    relay = relay_map.get(str(pin), None)
+    if not relay:
+        relay = LED(int(pin))
+        relay_map[str(pin)] = relay
     return relay
 
 def to_enable(request):
@@ -42,6 +44,7 @@ def to_enable(request):
     for target in targets:
         relay = get_relay(target)
         if relay:
+            logger.info("Enabling '{}'".format(target))
             relay.on()
             pass
         pass
@@ -52,6 +55,7 @@ def to_disable(request):
     for target in targets:
         relay = get_relay(target)
         if relay:
+            logger.info("Disabling '{}'".format(target))
             relay.off()
             pass
         pass
