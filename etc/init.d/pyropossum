@@ -20,7 +20,8 @@ CREDSFILE=/var/.awscredentials
 
 start() {
   export AWS_SHARED_CREDENTIALS_FILE=$CREDSFILE
-  if [ -f /var/run/$PIDNAME ] && kill -0 $(cat /var/run/$PIDNAME); then
+  ps -leaf | grep '/usr/bin/python3 -u /usr/local/bin/pyro[-]daemon' >> /dev/null
+  if [ "$?" = "0" ] ; then
     echo 'Service already running' >&2
     return 1
   fi
