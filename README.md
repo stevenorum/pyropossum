@@ -1,6 +1,6 @@
 # pyropossum
 
-pyropossum is a collection of arduino tools for home automation, currently focused on making it easy to remotely control stuff.  In the future, it may also be expanded to include sensors and data reading.
+pyropossum is a collection of tools for home automation, currently focused on making it easy to remotely control stuff.  In the future, it may also be expanded to include sensors and data reading.
 
 ## Setup
 The following terms are used to differentiate the different pieces of the system:
@@ -48,7 +48,7 @@ pyro-off
 
 4. In order to make sure the relays trigger, I'm using the output pins as base controllers for a transistor, which acts a switch to connect or disconnect the relay to the 5V output.  Normal RPi pins are only designed to output between 3mA (if all are in use) and 16mA (if only one is in use) (source for this is some random forum post; I can't verify that it's 100% correct).  In my limited testing this wasn't necessary, and the pins themselves were enough to trigger the relays, but overkill is underrated.
 
-5. Put the ReceiverUser creds into the file /var/.awscredentials on the receiver host
+5. Put the ReceiverUser creds into the file /var/.awscredentials on the receiver host:
 ```
 [pyropossum-receive]
 aws_access_key_id=AKIAXXXXXXXXXXXXXXXX
@@ -68,7 +68,7 @@ aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 sudo /etc/init.d/pyropossum start
 ```
-If it doesn't appear to be working, logs go to /var/log/pyropossum.log
+If it doesn't appear to be working, logs go to /var/log/pyropossum.log and cron logs go to /var/log/pyropossum.cron
 
 ### How to configure an IoT button to be a sender:
 1. Still need to write this section, but basically, spin up the iot.cf.json and button.cf.json CloudFormation templates.
