@@ -3,7 +3,9 @@
 import boto3
 from datetime import datetime
 import json
-from json.decoder import JSONDecodeError
+# For some reason the following import isn't working on the raspberry pi.
+# Probably due to python 3.4 vs 3.6 or something like that.
+# from json.decoder import JSONDecodeError
 import logging
 import threading
 
@@ -43,7 +45,9 @@ class Request(object):
     def from_sqs(cls, message):
         try:
             contents = json.loads(message['Body'])
-        except JSONDecodeError as e:
+        # See note in imports
+        # except JSONDecodeError as e:
+        except:
             return cls(enable=False, receipt_handle=message['ReceiptHandle'], valid=False)
         sns_topic = contents.get('TopicArn', None)
         if sns_topic:
