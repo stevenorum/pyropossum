@@ -8,22 +8,6 @@ from pyropossum.config import load_config, configure_logging
 
 logger = configure_logging("pyro-daemon")
 
-class LED(object):
-
-    def __init__(self, pin):
-        self.pin = pin
-        self.state = False
-        pass
-
-    def on(self):
-        logger.info("pin {} : now on (was {})".format(self.pin, "on" if self.state else "off"))
-        self.state = True
-        pass
-    def off(self):
-        logger.info("pin {} : now off (was {})".format(self.pin, "on" if self.state else "off"))
-        self.state = False
-        pass
-
 config = load_config()
 
 PROFILE_NAME = config["receive-profile"]
