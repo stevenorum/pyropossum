@@ -3,6 +3,7 @@
 import boto3
 from datetime import datetime
 import json
+from json.decoder import JSONDecodeError
 import logging
 import threading
 
@@ -10,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Request(object):
     '''Wrapper object for a binary on/off request.'''
-    def __init__(self, enable, receipt_handle, click_type=None, serial_number=None, timestamp=None, battery_voltage=None, source=None):
+    def __init__(self, enable, receipt_handle, click_type=None, serial_number=None, timestamp=None, battery_voltage=None, source=None, targets=[], valid=True):
         self.enable = enable
         self.click_type = click_type
         self.receipt_handle = receipt_handle
@@ -18,6 +19,8 @@ class Request(object):
         self.serial_number = serial_number if serial_number else source
         self.battery_voltage = battery_voltage
         self.timestamp = datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%fZ') if timestamp else datetime.utcnow()
+        self.targets = targets
+        self.valid = valid
         pass
 
     def repr(self):
@@ -31,12 +34,17 @@ class Request(object):
             "source":self.source,
             "serial_number":self.serial_number,
             "battery_voltage":self.battery_voltage,
-            "timestamp":self.timestamp.strftime('%Y-%m-%dT%H:%M:%S.%fZ') if self.timestamp else None
+            "timestamp":self.timestamp.strftime('%Y-%m-%dT%H:%M:%S.%fZ') if self.timestamp else None,
+            "targets":self.targets,
+            "valid":self.valid
         }
 
     @classmethod
     def from_sqs(cls, message):
-        contents = json.loads(message['Body'])
+        try:
+            contents = json.loads(message['Body'])
+        except JSONDecodeError as e:
+            return cls(enable=False, receipt_handle=message['ReceiptHandle'], valid=False)
         sns_topic = contents.get('TopicArn', None)
         if sns_topic:
             # It's SNS->SQS
@@ -51,14 +59,16 @@ class Request(object):
                            timestamp=contents['Timestamp'])
             else:
                 # Nothing else written yet.
-                return None
+                return cls(enable=False, receipt_handle=message['ReceiptHandle'], valid=False)
         else:
             # Raw SQS
             if contents.get("source",None) == "CLI":
                 return cls(enable=contents.get("enable"),
-                           receipt_handle=message['ReceiptHandle'])
+                           receipt_handle=message['ReceiptHandle'],
+                           targets=contents.get("targets", [])
+                )
             # Nothing else written yet.
-            return None
+            return cls(enable=False, receipt_handle=message['ReceiptHandle'], valid=False)
 
 def exec_actions(actions, *args, **kwargs):
     '''Call each function in actions, with the specified args and kwargs'''
@@ -98,10 +108,14 @@ class SqsPoller(object):
                 request = Request.from_sqs(message)
                 if request:
                     logger.info("Request received: " + request.repr())
-                    if request.enable:
-                        exec_actions(self.enable_actions, request)
-                    else:
-                        exec_actions(self.disable_actions, request)
+                    if request.valid:
+                        if request.enable:
+                            exec_actions(self.enable_actions, request)
+                            pass
+                        else:
+                            exec_actions(self.disable_actions, request)
+                            pass
+                        pass
                     self.sqs_client.delete_message(QueueUrl=self.queue_url,ReceiptHandle=request.receipt_handle)
 
     def start_polling_async(self):

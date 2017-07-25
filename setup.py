@@ -11,10 +11,14 @@ setup(
     license = "Beerware",
     keywords = "iot arduino aws sqs",
     url = "http://drelabs.com",
-    packages=['pyropossum','pyropossum/arduino', 'pyropossum/aws'],
+    packages=['pyropossum','pyropossum/arduino', 'pyropossum/aws', 'pyropossum/mocks'],
     scripts = [
         'scripts/pyro-on',
+        'scripts/pyro-lights-on',
+        'scripts/pyro-water-on',
         'scripts/pyro-off',
+        'scripts/pyro-lights-off',
+        'scripts/pyro-water-off',
         'scripts/pyro-daemon',
     ]
 )

@@ -1,13 +1,29 @@
 #!/usr/bin/env python3 -u
 
 import boto3
+#from gpiozero import LED
+from pyropossum.mocks.gpiozero import LED
 from pyropossum.aws.pollers import SqsPoller
-from pyropossum.arduino.core import Arduino, ArduinoException
-from pyropossum.arduino.commands import ENABLE, DISABLE
 from pyropossum.config import load_config, configure_logging
-import time
 
-logger = configure_logging(__name__)
+logger = configure_logging("pyro-daemon")
+
+class LED(object):
+
+    def __init__(self, pin):
+        self.pin = pin
+        self.state = False
+        pass
+
+    def on(self):
+        logger.info("pin {} : now on (was {})".format(self.pin, "on" if self.state else "off"))
+        self.state = True
+        pass
+    def off(self):
+        logger.info("pin {} : now off (was {})".format(self.pin, "on" if self.state else "off"))
+        self.state = False
+        pass
+
 config = load_config()
 
 PROFILE_NAME = config["receive-profile"]
@@ -21,22 +37,44 @@ resources = {resource["LogicalResourceId"] : resource['PhysicalResourceId'] for 
 
 queue_url = resources['SQSQueue']
 
-while True:
-    try:
-        with Arduino.discover(timeout=1) as arduino:
-            def on_enable(*args, **kwargs):
-                ENABLE.call(inputs=OUTPUT_PIN, arduino=arduino)
-                pass
-            def on_disable(*args, **kwargs):
-                DISABLE.call(inputs=OUTPUT_PIN, arduino=arduino)
-                pass
-            poller = SqsPoller(queue_url=queue_url,sqs_client=session.client('sqs'),enable_actions=[on_enable],disable_actions=[on_disable])
-            logger.info("Starting SQS polling.")
-            poller.start_polling()
+relay_map = {}
+
+pin_map = {
+    "LIGHT":18,
+    "WATER":23,
+    "DEFAULT":18
+}
+
+def get_relay(target):
+    pin = pin_map.get(target, pin_map.get("DEFAULT", None))
+    if not pin:
+        return None
+    relay = relay_map.get(pin, LED(int(pin)))
+    relay_map[pin] = relay
+    return relay
+
+def to_enable(request):
+    targets = request.targets if request.targets else ["DEFAULT"]
+    for target in targets:
+        relay = get_relay(target)
+        if relay:
+            relay.on()
             pass
         pass
-    except ArduinoException as e:
-        logger.exception(str(e))
-        time.sleep(5)
+    pass
+
+def to_disable(request):
+    targets = request.targets if request.targets else ["DEFAULT"]
+    for target in targets:
+        relay = get_relay(target)
+        if relay:
+            relay.off()
+            pass
         pass
+    pass
+
+while True:
+    poller = SqsPoller(queue_url=queue_url,sqs_client=session.client('sqs'),enable_actions=[to_enable],disable_actions=[to_disable])
+    logger.info("Starting SQS polling.")
+    poller.start_polling()
     pass
