@@ -5,13 +5,9 @@ pyropossum is a collection of arduino tools for home automation, currently focus
 ## Setup
 The following terms are used to differentiate the different pieces of the system:
 
-Receiver host: A computer that is waiting to receive instructions by listening on an AWS SQS queue.  It has an Arduino attached over USB to allow it to turn on or off external devices.  (For reference, I'm using a Raspberry Pi Zero Wireless, as it's more than powerful enough and costs $10.)
+Receiver host: A computer with accessible digital I/O pins that is waiting to receive instructions by listening on an AWS SQS queue.  (For reference, I'm using a Raspberry Pi Zero Wireless, as it's more than powerful enough and costs $10.)
 
 Sender host: A computer that sends instructions to the AWS SQS queue.  (For reference, I'm just using my laptop.)
-
-### How to set up an Arduino for use with pyropossum:
-1. Using the [Arduino IDE](https://www.arduino.cc/en/Main/Software), upload the [arduino.latest.ino](ino/arduino.latest.ino) program to the board.
-2. Hook the device you want to control up to one of the digital pins on the Arduino.  Make a note of which pin you use, as you'll need it later.
 
 ### How to set up the pyropossum AWS stack and the sender host:
 (All steps/links will assume the region is us-east-1, but this can be used in pretty much any AWS region.  us-east-1 just happens to be the geographically closest to me.)
@@ -23,7 +19,7 @@ Sender host: A computer that sends instructions to the AWS SQS queue.  (For refe
 aws_access_key_id=AKIAXXXXXXXXXXXXXXXX
 aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
-4. Put the following information into the file ~/.pyropossum/config.json:
+4. Put the following information into the file ~/.pyropossum/config.json ([here's my config as an example](config/send-config.json)):
 ```
 {
     "send-profile":"<the name in brackets in the credentials file>",
@@ -31,7 +27,6 @@ aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     "stack":"<CloudFormation stack name>"
 }
 ```
-[Here's my config as an example.](config/send-config.json)
 
 5. Install pyropossum from the command line.  The following line will do it, but you really should make sure to examine the [install script](install/sender-install.sh) first before piping it directly to sudo bash.
 ```
@@ -45,17 +40,21 @@ pyro-off
 (The commands won't do anything until your receiver-host is set up, obviously.)
 
 ### How to set up the receiver host for use with pyropossum:
-1a. If you're using a Raspberry Pi, you can use [PiBakery](http://www.pibakery.org) and [the included recipe](pibakery-recipe.xml) to perform a lot of the setup.  (You'll need to edit it to include your passwords, wifi info, and that sort of thing.)
+1. If you're using a Raspberry Pi, you can use [PiBakery](http://www.pibakery.org) and [the included recipe](pibakery-recipe.xml) to perform a lot of the setup.  (You'll need to edit it to include your passwords, wifi info, and that sort of thing.)
 
-1b. If you don't want to use PiBakery, you can instead install this from the [receiver-install.sh](install/receiver-install.sh) script.  It has dependencies on python3 and pip3.  Everything after that it should install for you.
+2. If you don't want to use PiBakery, you can instead install this from the [receiver-install.sh](install/receiver-install.sh) script.  It has dependencies on python3 and pip3.  Everything after that it should install for you.
 
-2. Put the ReceiverUser creds into the file /var/.awscredentials on the receiver host
+3. Connect the relays for your devices to digital output pins and update the pin map in pyro-daemon to have your mapping.
+
+4. In order to make sure the relays trigger, I'm using the output pins as base controllers for a transistor, which acts a switch to connect or disconnect the relay to the 5V output.  Normal RPi pins are only designed to output between 3mA (if all are in use) and 16mA (if only one is in use) (source for this is some random forum post; I can't verify that it's 100% correct).  In my limited testing this wasn't necessary, and the pins themselves were enough to trigger the relays, but overkill is underrated.
+
+5. Put the ReceiverUser creds into the file /var/.awscredentials on the receiver host
 ```
 [pyropossum-receive]
 aws_access_key_id=AKIAXXXXXXXXXXXXXXXX
 aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
-3. Put the following information into the file /etc/pyropossum/config.json:
+6. Put the following information into the file /etc/pyropossum/config.json ([here's my config as an example](config/receive-config.json)):
 ```
 {
     "receive-profile":"<the name in brackets in the credentials file>",
@@ -64,9 +63,8 @@ aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     "output":<digital pin on the Arduino to which the device being controlled is connected>
 }
 ```
-[Here's my config as an example.](config/receive-config.json)
 
-4. Run the following command to start the pyropossum daemon.  (For some reason it is't currently working with /usr/sbin/service, so you have to directly call the init.d script.)
+7. Run the following command to start the pyropossum daemon.  (For some reason it is't currently working with /usr/sbin/service, so you have to directly call the init.d script.)
 ```
 sudo /etc/init.d/pyropossum start
 ```
