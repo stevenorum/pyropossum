@@ -1,8 +1,8 @@
 #!/usr/bin/env python3 -u
 
 import boto3
-#from gpiozero import LED
-from pyropossum.mocks.gpiozero import LED
+from gpiozero import LED
+#from pyropossum.mocks.gpiozero import LED
 from pyropossum.aws.pollers import SqsPoller
 from pyropossum.config import load_config, configure_logging
 
