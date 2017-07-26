@@ -14,19 +14,23 @@
             "Properties" : {
                 "Code" : {
                     "ZipFile":{"Fn::Join": ["\n",[
-                        "import json",
+                        "import boto3, json",
+                        "sqs=boto3.client('sqs')",
                         "def lambda_handler(event, context):",
-                        "    print(json.dumps(event))",
-                        "    return json.dumps(event)",
-                        "",
-                        "",
+                        "    p={v['name'][0]:v['value'] for v in event['request']['intent']['slots'].values()}",
+                        "    d='LIGHT' if 'light' in p['d'] else 'WATER'",
+                        "    s=True if 'on' in p['s'] or 'start' in p['s'] else False",
+                        "    resp='Turning the {d} {s}'.format(d=d.lower(), s='on' if s else 'off')",
+                        "    #sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps({'targets':[d],'source':'alexa','enable':s}))",
+                        "    print(resp)",
+                        "    return {'version':'1.0','response':{'outputSpeech':{'type':'PlainText','text':resp},'shouldEndSession':True}}",
                         ""
                     ]]}},
                 "Environment" : {
                     "Variables": {}
                 },
                 "FunctionName" : { "Fn::Sub" : "${SystemID}AlexaFunction" },
-                "Handler" : "lambda_function.lambda_handler",
+                "Handler" : "index.lambda_handler",
                 "Role" : {
                     "Fn::GetAtt": [
                         "FunctionRole",
