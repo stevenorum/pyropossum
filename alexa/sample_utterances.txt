@@ -1,0 +1,10 @@
+SetDeviceState Turn {state} {article} {device}
+SetDeviceState Turn {state} {device}
+SetDeviceState Turn {device} {state}
+SetDeviceState Turn {article} {device} {state}
+SetDeviceState Set {state} {article} {device}
+SetDeviceState Set {state} {device}
+SetDeviceState Set {device} {state}
+SetDeviceState Set {article} {device} {state}
+SetDeviceState {state} {device}
+SetDeviceState {device} {state}

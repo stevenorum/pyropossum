@@ -1,0 +1,111 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Creates the AWS resources necessary to integrate IoT buttons into a PyroPossum system.",
+    "Parameters": {
+        "SystemID": {
+            "Type": "String",
+            "Default": "pyropossum",
+            "Description": "Name or ID for the PyroPossum system being set up.  Must be unique within the AWS Account, as it's used in IAM resource names (among other things).  Must be identical across all CF stacks in the system."
+        }
+    },
+    "Resources": {
+        "LambdaFunction" : {
+            "Type" : "AWS::Lambda::Function",
+            "Properties" : {
+                "Code" : {
+                    "ZipFile":{"Fn::Join": ["\n",[
+                        "import json",
+                        "def lambda_handler(event, context):",
+                        "    print(json.dumps(event))",
+                        "    return json.dumps(event)",
+                        "",
+                        "",
+                        ""
+                    ]]}},
+                "Environment" : {
+                    "Variables": {}
+                },
+                "FunctionName" : { "Fn::Sub" : "${SystemID}AlexaFunction" },
+                "Handler" : "lambda_function.lambda_handler",
+                "Role" : {
+                    "Fn::GetAtt": [
+                        "FunctionRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime" : "python3.6"
+            }
+        },
+        "LambdaLoggingPolicy": {
+            "Type": "AWS::IAM::ManagedPolicy",
+            "Properties": {
+                "Description" : "Policy granting permission to log from lambda functions.",
+                "PolicyDocument" : {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": "logs:CreateLogGroup",
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    ":",
+                                    ["arn:aws:logs",
+                                     {"Ref": "AWS::Region"},
+                                     {"Ref": "AWS::AccountId"},
+                                     "*"]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": [
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    ":",
+                                    ["arn:aws:logs",
+                                     {"Ref": "AWS::Region"},
+                                     {"Ref": "AWS::AccountId"},
+                                     "log-group:/aws/lambda/*"]
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "ManagedPolicyName" : { "Fn::Sub" : "${SystemID}LambdaLoggingPolicy" }
+            }
+        },
+        "FunctionRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": ["lambda.amazonaws.com"]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "Path": "/",
+                "ManagedPolicyArns": [
+                    {"Ref": "LambdaLoggingPolicy"},
+                    {"Fn::ImportValue" : {"Fn::Sub" : "${SystemID}-SendSQSPolicy"}}
+                ]
+            }
+        }
+    },
+    "Outputs": {
+        "FunctionArn": {
+            "Description" : "ARN of the Alexa Lambda function.",
+            "Value" : {"Fn::GetAtt": [ "LambdaFunction", "Arn" ]}
+        }
+    }
+}

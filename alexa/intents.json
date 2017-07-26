@@ -1,0 +1,21 @@
+{
+  "intents": [
+    {
+      "intent": "SetDeviceState",
+      "slots": [
+        {
+          "name": "article",
+          "type": "ARTICLE"
+        },
+        {
+          "name": "device",
+          "type": "DEVICE"
+        },
+        {
+          "name": "state",
+          "type": "DEVICE_STATE"
+        }
+      ]
+    }
+  ]
+}

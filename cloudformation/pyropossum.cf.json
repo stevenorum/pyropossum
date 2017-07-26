@@ -132,6 +132,13 @@
             "Export" : {
                 "Name" : { "Fn::Sub" : "${SystemID}-SQSQueueArn" }
             }
+        },
+        "SendSQSPolicy": {
+            "Description" : "ARN of the IAM policy giving permission to send SQS messages to the queue.",
+            "Value" : {"Ref":"SendSQSPolicy"},
+            "Export" : {
+                "Name" : { "Fn::Sub" : "${SystemID}-SendSQSPolicy" }
+            }
         }
     }
 }

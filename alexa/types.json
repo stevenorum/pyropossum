@@ -1,0 +1,30 @@
+{
+    "DEVICE":[
+        "light",
+        "lights",
+        "water",
+        "sprinkler",
+        "sprinklers",
+        "cannon",
+        "fountain",
+        "hose"
+    ],
+    "DEVICE_STATE":[
+        "on",
+        "off",
+        "yes",
+        "no",
+        "enabled",
+        "disabled",
+        "stop",
+        "start",
+        "stopped",
+        "started"
+    ],
+    "ARTICLE":[
+        "the",
+        "a",
+        "our",
+        "my"
+    ]
+}
