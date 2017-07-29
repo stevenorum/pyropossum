@@ -21,7 +21,7 @@
                         "    d='LIGHT' if 'light' in p['d'] else 'WATER'",
                         "    s=True if 'on' in p['s'] or 'start' in p['s'] else False",
                         "    resp='Turning the {d} {s}'.format(d=d.lower(), s='on' if s else 'off')",
-                        "    #sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps({'targets':[d],'source':'alexa','enable':s}))",
+                        "    sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps({'targets':[d],'source':'alexa','enable':s}))",
                         "    print(resp)",
                         "    return {'version':'1.0','response':{'outputSpeech':{'type':'PlainText','text':resp},'shouldEndSession':True}}",
                         ""

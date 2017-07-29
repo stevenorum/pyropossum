@@ -66,7 +66,7 @@ class Request(object):
                 return cls(enable=False, receipt_handle=message['ReceiptHandle'], valid=False)
         else:
             # Raw SQS
-            if contents.get("source",None) == "CLI":
+            if contents.get("source","").lower() in ["cli","alexa"]:
                 return cls(enable=contents.get("enable"),
                            receipt_handle=message['ReceiptHandle'],
                            targets=contents.get("targets", [])
