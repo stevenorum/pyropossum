@@ -36,7 +36,8 @@ def dump_port_info(port):
 BOARDS = {
     (6790,29987):("AMZN/Gikfun","Nano Clone"), # http://amzn.to/2vbf0Qo
     (9025,32822):("AMZN/KOOKYE","Pro Micro/Leonardo Clone"), # http://amzn.to/2tk9eyE
-    (1027,24597):("SparkFun","RedBoard") # http://amzn.to/2uBO3It / https://www.sparkfun.com/products/13975
+    (1027,24597):("SparkFun","RedBoard"), # http://amzn.to/2uBO3It / https://www.sparkfun.com/products/13975
+    (9025,32822):("eBay","Leonardo USB dongle"),
 }
 
 def get_arduino_info(p):
